@@ -1,7 +1,22 @@
-export default function EditMeetingPage() {
+import { getMeetingById } from "@/lib/meetings-db";
+import { notFound } from "next/navigation";
+import EditMeetingForm from "./edit-meeting-form";
+
+export default async function EditMeetingPage({
+        params,
+    }: {
+        params: Promise<{ id: string }>;
+    }) {
+
+    const {id} = await params;
+
+    const meeting = await getMeetingById(Number(id));
+
+    if(!meeting){
+        notFound();
+    }
+
     return (
-        <h1>
-            Edit Meeting - Coming in Week 04
-        </h1>
+        <EditMeetingForm meeting={meeting} />
     );
 }

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import MeetingCard from "@/components/MeetingCard";
 import { getMeetings, getMeetingsTotalPages } from "@/lib/meetings-db";
 import { MeetingSearch } from "@/components/MeetingSearch";
@@ -17,7 +18,15 @@ export default async function MeetingsPage(props: {
 
     return (
     <div>
-      <MeetingSearch />
+      <div className="mb-4">
+        <Link href="/meetings/new" 
+        className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold">
+      New Meeting
+      </Link>
+    </div>
+
+    <MeetingSearch />
+
       {meetings.map((meeting) => (
         <MeetingCard key={meeting.id} meeting={meeting} />
       ))}

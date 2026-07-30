@@ -1,5 +1,6 @@
 import MeetingDetail from "@/components/MeetingDetail";
 import { getMeetingById } from "@/lib/meetings-db";
+import { notFound } from "next/navigation";
 
 export default async function MeetingPage({
     params,
@@ -8,11 +9,20 @@ export default async function MeetingPage({
     }) {
     const { id } = await params;
 
-    const meeting = await getMeetingById(Number(id));
+    const meetingId = Number(id);
+
+    if (Number.isNaN(meetingId)) {
+        notFound();
+    }
+    
+    const meeting = await getMeetingById(meetingId);
 
     if (!meeting) {
-        return <p>Meeting not found.</p>;
+        notFound();
     }
 
-    return <MeetingDetail meeting={meeting} />;
+    return(
+        <MeetingDetail meeting={meeting} />
+    );
+    
 }
