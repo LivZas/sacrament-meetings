@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import MeetingCard from "@/components/MeetingCard";
 import { getMeetings, getMeetingsTotalPages } from "@/lib/meetings-db";
 import { MeetingSearch } from "@/components/MeetingSearch";
 import { Pagination } from "@/components/Pagination";
+
+export const metadata: Metadata = {
+  title: "Meetings",
+  description:
+  "This is the meetings section to view the sacrament meetings planned for the Caracas ward.",
+};
 
 export default async function MeetingsPage(props: {
     searchParams?: Promise<{ query?: string; page?: string }>;

@@ -15,8 +15,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sacrament Meeting Planner",
-  description: "Meeting planning for our sacrament.",
+  title: {
+    default: "Caracas Ward | Sacrament Meeting Planner",
+    template: "%s | Caracas Ward",
+},
+description:
+"This is a sacrament meeting planner for The Caracas ward.",
+metadataBase: new URL("https://sacrament-meetings-orpin.vercel.app/")
 };
 
 export default function RootLayout({

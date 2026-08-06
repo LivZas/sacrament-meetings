@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { auth } from "@/auth";
 import { deleteMeeting } from "@/lib/actions";
 import type { SacramentMeeting } from "@/lib/types";
 
@@ -6,7 +7,8 @@ interface MeetingCardProps {
   meeting: SacramentMeeting;
 }
         
-export default function MeetingCard({ meeting }: MeetingCardProps) {
+export default async function MeetingCard({ meeting }: MeetingCardProps) {
+  const session = await auth();
   return (
     <article className="p-4 border-l-4 border-blue-600 bg-gray-800 rounded">
       <h3 className="text-xl font-bold mb-2">{meeting.date}</h3>
@@ -18,7 +20,8 @@ export default function MeetingCard({ meeting }: MeetingCardProps) {
       className="text-blue-400 hover:underline">
         View meeting details</Link>
 
-        <div className="flex gap-2">
+        {session?.user && (
+        <div className="mt-4 flex gap-2">
 
           <Link href={`/meetings/${meeting.id}/edit`}
           className="rounded-md bg-blue-600 px-3 py-1 font-semibold text-white hover:bg-blue-700">
@@ -37,6 +40,7 @@ export default function MeetingCard({ meeting }: MeetingCardProps) {
 
           </form>
         </div>
+        )}
     </article>
   );
 }

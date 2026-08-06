@@ -3,8 +3,41 @@
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { auth, signIn } from '@/auth';
+import { AuthError } from 'next-auth';
+import bcrypt from 'bcryptjs';
+import { createUser } from './users-db';
 
 import { addMeeting, updateMeeting as updateMeetingInDb, deleteMeeting as deleteMeetingInDb } from "@/lib/meetings-db";
+
+async function requireAuth() {
+    const session = await auth();
+
+    if(!session?.user) {
+        redirect("/login");
+    }
+
+    return session;
+}
+
+export async function authenticate(
+    prevState: string | undefined,
+    formData: FormData
+) {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid email or password.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
+  }
+}
 
 
 const MeetingFormSchema = z.object({
@@ -85,10 +118,37 @@ export type State = {
     message?: string | null;
 };
 
+export async function registerUser(
+    formData: FormData
+) {
+
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!name || !email || !password) {
+        return;
+    }
+
+    const passwordHash = await bcrypt.hash(
+        password,
+        10
+    );
+
+    await createUser(
+        name,
+        email,
+        passwordHash
+    );
+
+    redirect("/login");
+}
+
 export async function createMeeting(
     prevState: State,
     formData: FormData
 ): Promise<State> {
+    await requireAuth();
     const raw = {
         date: formData.get("date"),
         meetingType: formData.get("meetingType"),
@@ -174,7 +234,7 @@ export async function updateMeeting(
     prevState: State,
     formData: FormData
 ): Promise<State> {
-
+    await requireAuth();
     const raw = {
         date: formData.get("date"),
         meetingType: formData.get("meetingType"),
@@ -271,7 +331,7 @@ try {
 }
 
 export async function deleteMeeting(formData: FormData): Promise<void> {
-    
+    await requireAuth();
     const id = Number(formData.get("id"));
 
     try {
